@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, AlertCircle } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Wallet } from 'lucide-react';
+import { ethers } from 'ethers';
+import { onboard } from '../utils/web3Provider';
+import { WalletState, TrueVoteContract } from '../types/contract';
+import TrueVoteABI from './contracts/TrueVote.json';
+
+const CONTRACT_ADDRESS = '0xa7A38ceEd4a71B6d7c26b3764c44145aa4808009';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -8,6 +14,34 @@ export default function Login() {
     password: ''
   });
   const [error, setError] = useState('');
+  const [wallet, setWallet] = useState<WalletState | null>(null);
+  const [contract, setContract] = useState<TrueVoteContract | null>(null);
+
+  const connectWallet = async (): Promise<void> => {
+    const wallets = await onboard.connectWallet();
+    
+    if (wallets[0]) {
+      const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider);
+      const signer = ethersProvider.getSigner();
+      
+      const trueVoteContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        TrueVoteABI,
+        signer
+      ) as TrueVoteContract;
+
+      setWallet(wallets[0]);
+      setContract(trueVoteContract);
+    }
+  };
+
+  const disconnectWallet = async (): Promise<void> => {
+    if (wallet) {
+      await onboard.disconnectWallet({ label: wallet.label });
+      setWallet(null);
+      setContract(null);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -20,11 +54,21 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
+    if (!wallet) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
     try {
-      // TODO: Implement actual login logic
-      console.log('Login attempt:', { ...formData, password: '[REDACTED]' });
+      // Implement login logic with both wallet and credentials
+      console.log('Login attempt:', {
+        ...formData,
+        password: '[REDACTED]',
+        walletAddress: wallet.accounts[0].address
+      });
+      redirect('/register');
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      setError('Login failed. Please check your credentials and wallet connection.');
     }
   };
 
@@ -50,7 +94,28 @@ export default function Login() {
           </div>
         )}
 
+        <div className="flex justify-center">
+          {!wallet ? (
+            <button
+              onClick={connectWallet}
+              className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-patriot-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200"
+            >
+              <Wallet className="h-5 w-5 mr-2" />
+              Connect Wallet
+            </button>
+          ) : (
+            <button
+              onClick={disconnectWallet}
+              className="flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200"
+            >
+              <Wallet className="h-5 w-5 mr-2" />
+              {wallet.accounts[0].address.slice(0, 6)}...{wallet.accounts[0].address.slice(-4)}
+            </button>
+          )}
+        </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Existing form fields */}
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="email" className="sr-only">

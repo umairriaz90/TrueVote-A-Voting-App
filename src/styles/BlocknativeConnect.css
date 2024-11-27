@@ -1,0 +1,27 @@
+.connect-btn, .disconnect-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.connect-btn {
+  background: #6851ff;
+  color: white;
+  border: none;
+}
+
+.disconnect-btn {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.connect-btn:hover {
+  background: #5440e3;
+}
+
+.disconnect-btn:hover {
+  background: #e5e5e5;
+}

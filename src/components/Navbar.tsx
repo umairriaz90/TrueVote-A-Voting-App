@@ -48,7 +48,7 @@ export default function Navbar() {
               </div>
               <div className="ml-12">
                 <Link 
-                  to="/register" 
+                  to="/Login" 
                   className="inline-flex items-center px-6 py-2.5 border border-white text-sm font-medium rounded-md text-white bg-gradient-to-r from-patriot-red to-patriot-blue hover:from-patriot-blue hover:to-patriot-red transition-all duration-300 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                 >
                   Register / Login to Vote
