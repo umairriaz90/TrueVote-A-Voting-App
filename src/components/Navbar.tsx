@@ -45,6 +45,12 @@ export default function Navbar() {
                 >
                   Analytics
                 </Link>
+                <Link 
+                  to="/vote/0" 
+                  className="text-white hover:text-gray-200 transition-colors duration-200 text-sm font-medium"
+                >
+                  Vote
+                </Link>
               </div>
               <div className="ml-12">
                 <Link 

@@ -6,7 +6,7 @@ import { onboard } from '../utils/web3Provider';
 import { WalletState, TrueVoteContract } from '../types/contract';
 import TrueVoteABI from './contracts/TrueVote.json';
 
-const CONTRACT_ADDRESS = '0xa7A38ceEd4a71B6d7c26b3764c44145aa4808009';
+const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
 
 export default function Register() {
   const navigate = useNavigate();

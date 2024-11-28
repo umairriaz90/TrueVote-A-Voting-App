@@ -7,7 +7,15 @@ export interface WalletState {
 }
 
 export interface TrueVoteContract extends ethers.Contract {
-  // Add your contract's function types here
-  vote: (candidateId: number) => Promise<ethers.ContractTransaction>;
-  // Add other contract functions as needed
-}
+    registerVoter: (
+      firstName: string,
+      lastName: string,
+      voterId: string,
+      email: string,
+      age: number,
+      region: string,
+      group: string,
+      hashedPassword: string
+    ) => Promise<ethers.ContractTransaction>;
+  }
+  

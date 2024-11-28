@@ -16,20 +16,18 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
         string group;
         bool isRegistered;
         uint256 votingTime;
+        bytes32 hashedpassword;
+        uint256 candidateId;
     }
-    
+
     struct Candidate {
-        uint256 id;
-        string firstName;
-        string lastName;
-        string voterId;
-        string email;
-        uint256 voteCount;
+    string name;
+    uint voteCount;
     }
     
     struct Election {
         uint256 id;
-        string name;
+        string title;
         uint256 startTime;
         uint256 endTime;
         bool isActive;
@@ -40,9 +38,12 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
         mapping(uint256 => uint256) ageGroupVotes;
         mapping(string => uint256) groupVotes;
         mapping(uint256 => uint256) hourlyVotes;
-        Candidate[] candidates;
     }
     
+    mapping(address => Voter[]) public votersVotesMap; // Mapping of addresses with their respective votes.
+    // At contract level
+    mapping(uint256 => uint256) private candidateVoteCounts;
+
     mapping(uint256 => Election) public elections;
     mapping(address => Voter) public voters;
     mapping(string => bool) private usedVoterIds;
@@ -94,15 +95,20 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
             region: _region,
             group: _group,
             isRegistered: true,
-            votingTime: 0
+            votingTime: 0,
+            hashedpassword: _hashedPassword,
+            candidateId: 0
         });
         
         usedVoterIds[_voterId] = true;
         emit VoterRegistered(msg.sender, _voterId);
     }
+
+    
+
     
     function castVote(uint256 _electionId, uint256 _candidateId) 
-        external 
+        external
         nonReentrant 
         whenNotPaused
         onlyRegisteredVoter 
@@ -113,7 +119,7 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
         
         election.hasVoted[msg.sender] = true;
         election.votedCount++;
-        election.candidates[_candidateId].voteCount++;
+        election.totalVoters++;
         
         // Update analytics
         Voter storage voter = voters[msg.sender];
@@ -124,6 +130,7 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
         
         // Record voting time
         voter.votingTime = block.timestamp;
+        voter.candidateId = _candidateId;
         
         // Encrypt vote data
         bytes32 encryptedVote = keccak256(abi.encodePacked(
@@ -134,6 +141,113 @@ contract TrueVote is ReentrancyGuard, Ownable, Pausable {
         ));
         
         emit VoteCast(_electionId, encryptedVote);
+    }
+
+    function getAllVoters() public view returns (address[] memory) {
+    uint256 voterCount = 0;
+    
+    // First pass: count total registered voters
+    for (uint256 i = 0; i < electionCount; i++) {
+        Election storage election = elections[i];
+        voterCount = election.totalVoters;
+    }
+    
+    // Create array with exact size needed
+    address[] memory voterAddresses = new address[](voterCount);
+    uint256 currentIndex = 0;
+    
+    // Second pass: store voter addresses
+    for (uint256 i = 0; i < electionCount; i++) {
+        Election storage election = elections[i];
+        if (election.isActive || !election.isActive) { // Include all elections
+            for (uint256 j = 0; j < election.totalVoters; j++) {
+                address voterAddress = msg.sender; // Replace with actual voter address
+                if (voters[voterAddress].isRegistered) {
+                    voterAddresses[currentIndex] = voterAddress;
+                    currentIndex++;
+                }
+            }
+        }
+    }
+    
+    return voterAddresses;
+}
+
+
+    function getElectionResults(uint256 _electionId) 
+    external 
+    view 
+    returns (uint256[] memory candidateIds, uint256[] memory voteResults) 
+{
+    Election storage election = elections[_electionId];
+    require(_electionId <= electionCount, "Election does not exist");
+    require(election.totalVoters > 0, "No voters registered for this election");
+    
+    uint256 maxCandidateId = 0;
+    
+    // First determine max candidate ID and create temporary count array
+    address[] memory voterAddresses = getAllVoters();
+    require(voterAddresses.length > 0, "No voters found");
+    
+    for (uint256 i = 0; i < voterAddresses.length; i++) {
+        address voterAddr = voterAddresses[i];
+        if (election.hasVoted[voterAddr]) {
+            uint256 candidateId = voters[voterAddr].candidateId;
+            if (candidateId > maxCandidateId) {
+                maxCandidateId = candidateId;
+            }
+        }
+    }
+    
+    require(maxCandidateId > 0, "No votes cast yet");
+    
+    // Create arrays for results
+    candidateIds = new uint256[](maxCandidateId);
+    voteResults = new uint256[](maxCandidateId);
+    
+    // Count votes
+    for (uint256 i = 0; i < voterAddresses.length; i++) {
+        address voterAddr = voterAddresses[i];
+        if (election.hasVoted[voterAddr]) {
+            uint256 candidateId = voters[voterAddr].candidateId;
+            voteResults[candidateId - 1]++;
+        }
+    }
+    
+    // Fill candidate IDs
+    for (uint256 i = 1; i <= maxCandidateId; i++) {
+        candidateIds[i-1] = i;
+    }
+    
+    // Sort results by vote count (descending)
+    for (uint256 i = 0; i < maxCandidateId - 1; i++) {
+        for (uint256 j = 0; j < maxCandidateId - i - 1; j++) {
+            if (voteResults[j] < voteResults[j + 1]) {
+                // Swap vote counts
+                uint256 tempCount = voteResults[j];
+                voteResults[j] = voteResults[j + 1];
+                voteResults[j + 1] = tempCount;
+                
+                // Swap candidate IDs
+                uint256 tempId = candidateIds[j];
+                candidateIds[j] = candidateIds[j + 1];
+                candidateIds[j + 1] = tempId;
+            }
+        }
+    }
+}
+
+
+
+    // Function to activate election
+    function activateElection(uint256 _electionId) external onlyOwner {
+        require(elections[_electionId].isActive == false, "Election must be inactive");
+        
+        elections[_electionId].isActive = true;
+        elections[_electionId].startTime = block.timestamp;
+        elections[_electionId].endTime = block.timestamp + 24 hours;
+        electionCount++;
+        emit ElectionCreated(_electionId);
     }
     
     function getVoterAnalytics(uint256 _electionId) 
