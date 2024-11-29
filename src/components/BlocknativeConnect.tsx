@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { onboard } from '../utils/web3Provider';
-import TrueVoteABI from '../contracts/TrueVote.json';
+import TrueVoteABI from './contracts/TrueVote.json';
 import { WalletState, TrueVoteContract } from '../types/contract';
 
 const CONTRACT_ADDRESS = '0xa7A38ceEd4a71B6d7c26b3764c44145aa4808009';
