@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, AlertCircle, Wallet } from 'lucide-react';
 import { ethers } from 'ethers';
 import { onboard } from '../utils/web3Provider';
@@ -66,7 +66,7 @@ export default function Login() {
         password: '[REDACTED]',
         walletAddress: wallet.accounts[0].address
       });
-      redirect('/register');
+    
     } catch (err) {
       setError('Login failed. Please check your credentials and wallet connection.');
     }
