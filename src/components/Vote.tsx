@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 import TrueVoteABI from './contracts/TrueVote.json';
 import { onboard } from '../utils/web3Provider';
+import { useWallet } from '../contexts/WalletContext';
 import { WalletState, TrueVoteContract } from '../types/contract';
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
@@ -37,17 +38,19 @@ const MOCK_CANDIDATES = [
 export default function Vote() {
   const { electionId } = useParams();
   const navigate = useNavigate();
-  const [wallet, setWallet] = useState<WalletState | null>(null);
   const [contract, setContract] = useState<TrueVoteContract | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState('');
+  const { wallet } = useWallet();
+  
+
+  
 
   const connectWallet = async (): Promise<void> => {
-    const wallets = await onboard.connectWallet();
-    
-    if (wallets[0]) {
-      const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider);
+
+   if (wallet) {
+      const ethersProvider = new ethers.providers.Web3Provider(wallet.provider);
       const signer = ethersProvider.getSigner();
       
       const trueVoteContract = new ethers.Contract(
@@ -56,16 +59,19 @@ export default function Vote() {
         signer
       ) as TrueVoteContract;
 
-      setWallet(wallets[0]);
+    
       setContract(trueVoteContract);
+      
     }
   };
 
   const handleVote = async () => {
+    connectWallet();
     if (!contract || !wallet) {
       setError('Please connect your wallet first');
       return;
     }
+    
 
     if (!selectedCandidate) {
       setError('Please select a candidate');
@@ -84,7 +90,7 @@ export default function Vote() {
       const receipt = await tx.wait();
       console.log('Vote cast successfully:', receipt);
       
-      navigate('/voting-success');
+      navigate('/analytics');
     } catch (err: any) {
       console.error('Error casting vote:', err);
       setError(err.reason || 'Failed to cast vote');

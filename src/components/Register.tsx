@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, AlertCircle, Wallet } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Wallet, CreditCard } from 'lucide-react';
 import { ethers } from 'ethers';
 import { onboard } from '../utils/web3Provider';
 import { WalletState, TrueVoteContract } from '../types/contract';
+import { useWallet } from '../contexts/WalletContext';
 import TrueVoteABI from './contracts/TrueVote.json';
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
@@ -22,26 +23,9 @@ export default function Register() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [wallet, setWallet] = useState<WalletState | null>(null);
+  const { wallet } = useWallet();
   const [contract, setContract] = useState<TrueVoteContract | null>(null);
 
-  const connectWallet = async (): Promise<void> => {
-    const wallets = await onboard.connectWallet();
-    
-    if (wallets[0]) {
-      const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider);
-      const signer = ethersProvider.getSigner();
-      
-      const trueVoteContract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        TrueVoteABI,
-        signer
-      ) as TrueVoteContract;
-
-      setWallet(wallets[0]);
-      setContract(trueVoteContract);
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -50,7 +34,27 @@ export default function Register() {
     });
   };
 
+  
+  const connectWallet = async (): Promise<void> => {
+
+    if (wallet) {
+       const ethersProvider = new ethers.providers.Web3Provider(wallet.provider);
+       const signer = ethersProvider.getSigner();
+       
+       const trueVoteContract = new ethers.Contract(
+         CONTRACT_ADDRESS,
+         TrueVoteABI,
+         signer
+       ) as TrueVoteContract;
+ 
+     
+       setContract(trueVoteContract);
+       
+     }
+   };
+
   const registerVoter = async () => {
+    connectWallet();
     if (!contract || !wallet) {
       setError('Please connect your wallet first');
       return false;
@@ -126,22 +130,7 @@ export default function Register() {
         )}
 
         <div className="flex justify-center">
-          {!wallet ? (
-            <button
-              onClick={connectWallet}
-              className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-patriot-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200"
-            >
-              <Wallet className="h-5 w-5 mr-2" />
-              Connect Wallet
-            </button>
-          ) : (
-            <div className="flex items-center px-4 py-2 border border-gray-300 rounded-md">
-              <Wallet className="h-5 w-5 mr-2 text-green-500" />
-              <span className="text-sm text-gray-700">
-                {wallet.accounts[0].address.slice(0, 6)}...{wallet.accounts[0].address.slice(-4)}
-              </span>
-            </div>
-          )}
+          
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -167,6 +156,26 @@ export default function Register() {
       className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-patriot-blue focus:border-patriot-blue focus:z-10 sm:text-sm"
       placeholder="Last Name"
     />
+  </div>
+  <div>
+  <label htmlFor="voterID" className="sr-only">
+                Voter ID
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <CreditCard className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="voterID"
+                  name="voterID"
+                  type="text"
+                  required
+                  value={formData.voterID}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-patriot-blue focus:border-patriot-blue focus:z-10 sm:text-sm"
+                  placeholder="Voter ID Number"
+                />
+              </div>
   </div>
   <div>
     <input

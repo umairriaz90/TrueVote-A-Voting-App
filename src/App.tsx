@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
+import { WalletProvider } from './contexts/WalletContext';
 import Dashboard from './components/Dashboard';
 import HowItWorks from './components/HowItWorks';
 import Vote from './components/Vote';
@@ -14,6 +15,8 @@ import EducationPortal from './components/education/EducationPortal';
 
 function App() {
   return (
+    
+      <WalletProvider>
     <div className="min-h-screen bg-gradient-to-br from-patriot-blue to-white flex flex-col">
       <Navbar />
       <Routes>
@@ -29,6 +32,8 @@ function App() {
       </Routes>
       <Footer />
     </div>
+    </WalletProvider>
+    
   );
 }
 
