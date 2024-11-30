@@ -115,6 +115,9 @@ export default function Navbar() {
             >
               Register / Login to Vote
             </Link>
+            <div className="ml-12">
+                <WalletConnect />
+              </div>
           </div>
         </div>
       </div>
