@@ -64,7 +64,7 @@ export function WalletConnect() {
         </button>
       ) : (
         <div className='btn btn-primary text-white'>
-          <p>0x{wallet.accounts[0].address.slice(16)}...</p>
+          <p>{wallet.accounts[0].address.slice(0,6)}...{wallet.accounts[0].address.slice(-4)}</p>
           <p>Balance: {balance} ETH</p>
           <button onClick={disconnectWallet}>Disconnect</button>
         </div>
