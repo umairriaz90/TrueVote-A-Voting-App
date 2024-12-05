@@ -1,19 +1,26 @@
-export async function sendOtp(type: 'email' | 'phone', identifier: string) {
-  // Implement OTP generation and sending logic
-  // Use services like SendGrid for email or Twilio for SMS
-  // Return the OTP code
-  return '123456'; // Replace with the actual OTP code
-}
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-export async function verifyOtp(type: 'email' | 'phone', identifier: string, otp: string) {
-  // Implement OTP verification logic
-  // Compare the provided OTP with the stored OTP
-  // Return true if OTP is valid, false otherwise
-  return true; // Replace with the actual verification result
-}
+export const authApi = {
+  async getCurrentUser() {
+    const token = localStorage.getItem('authToken');
+    if (!token) throw new Error('No auth token found');
+    
+    const response = await axios.get(`${API_BASE_URL}/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
 
-export async function bindWalletToUser(userId: string, walletAddress: string) {
-  // Store wallet binding in your database
-  // Return true if binding is successful, false otherwise
-  return true; // Replace with the actual binding result
-}
+  async sendOtp(email: string) {
+    const response = await axios.post(`${API_BASE_URL}/auth/send-otp`, { email });
+    return response.data;
+  },
+
+  async verifyOtp(email: string, otp: string) {
+    const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, { email, otp });
+    return response.data;
+  }
+};

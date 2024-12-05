@@ -1,7 +1,7 @@
-import express from 'express';
-import { sendOtpHandler, verifyOtpHandler, bindWalletHandler } from '../controllers/auth';
+import { Router } from 'react-router-dom';
+import { sendOtpHandler } from '../controllers/auth';
 
-const router = express.Router();
+const router = Router('/api/auth');
 
 router.post('/send-otp', sendOtpHandler);
 router.post('/verify-otp', verifyOtpHandler);

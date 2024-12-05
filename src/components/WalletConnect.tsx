@@ -1,4 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 
 export function WalletConnect() {
   const { wallet, setWallet, onboard } = useWallet();
