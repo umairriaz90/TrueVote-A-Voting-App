@@ -4,11 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "server": "nodemon --watch src --exec ts-node src/server/index.ts",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.699.0",
@@ -33,16 +32,18 @@
     "@web3-onboard/walletconnect": "^2.6.1",
     "chart.js": "^4.4.0",
     "dotenv": "^16.4.5",
+    "eslint-config-next": "^15.0.3",
     "ethers": "^5.7.2",
     "express": "^4.21.1",
     "form-data": "^4.0.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.292.0",
     "mailgun.js": "^10.2.4",
+    "next": "^15.0.3",
     "nodemailer": "^6.9.16",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^6.18.0",
     "resend": "^4.0.1",
     "twilio": "^5.3.6"
@@ -60,7 +61,6 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5.7.2",
-    "vite": "^4.4.5"
+    "typescript": "^5.7.2"
   }
 }

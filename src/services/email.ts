@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const emailService = {
   async sendOtp(email: string, otp: string) {
-    return resend.emails.send({
+    await resend.emails.send({
       from: 'TrueVote <noreply@truevote.com>',
       to: email,
       subject: 'Your Verification Code',

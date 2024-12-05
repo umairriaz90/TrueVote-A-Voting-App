@@ -13,6 +13,9 @@ import About from './components/About';
 import AnalyticsDashboard from './components/analytics/AnalyticsDashboard';
 import EducationPortal from './components/education/EducationPortal';
 import { AuthProvider } from './contexts/AuthContext';
+import ApiRoutes from './routes/api'; // Create this file to handle API routes
+
+
 
 function App() {
   return (
@@ -30,6 +33,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/analytics" element={<AnalyticsDashboard />} />
         <Route path="/education" element={<EducationPortal />} />
+        <Route path="/api/*" element={<ApiRoutes />} />
+
       </Routes>
       <Footer />
     </div>
