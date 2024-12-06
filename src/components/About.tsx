@@ -1,14 +1,9 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Shield,
   Users,
   Globe,
-  Award,
-  TrendingUp,
-  Check,
   ChevronRight,
-  Building2,
   Fingerprint,
   Scale,
   LineChart,

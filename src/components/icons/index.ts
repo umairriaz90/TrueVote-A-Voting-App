@@ -1,4 +1,3 @@
-import { LucideProps } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import icons with no SSR to prevent hydration issues

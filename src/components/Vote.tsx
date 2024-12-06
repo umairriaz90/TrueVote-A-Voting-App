@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
 import TrueVoteABI from './contracts/TrueVote.json';
-import { onboard } from '../utils/web3Provider';
 import { useWallet } from '../contexts/WalletContext';
-import { WalletState, TrueVoteContract } from '../types/contract';
+import { TrueVoteContract } from '../types/contract';
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
 

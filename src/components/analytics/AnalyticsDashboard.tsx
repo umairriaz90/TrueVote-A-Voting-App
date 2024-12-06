@@ -1,4 +1,3 @@
-import React from 'react';
 import { BarChart2, Users, Clock, Map } from "lucide-react";
 import StatCard from "./StatCard";
 import VoterTurnoutChart from "./VoterTurnoutChart";
@@ -51,7 +50,7 @@ export default function AnalyticsDashboard() {
               value={stat.value}
               icon={stat.icon}
               change={stat.change}
-              changeType={stat.changeType}
+              changeType={stat.changeType as "positive" | "neutral" | "negative"}
             />
           ))}
         </div>

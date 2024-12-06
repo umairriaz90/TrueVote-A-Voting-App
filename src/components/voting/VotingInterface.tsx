@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { AlertCircle } from 'lucide-react';
 import CandidateCard from './CandidateCard.tsx';
 import WriteInBallot from './WriteInBallot.tsx';
 import VoteConfirmation from './VoteConfirmation.tsx';
@@ -123,6 +123,7 @@ export default function VotingInterface({
             isSubmitting={isSubmitting}
           />
         )}
+        {electionId}
       </div>
     </div>
   );

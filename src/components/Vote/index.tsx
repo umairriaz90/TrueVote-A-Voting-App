@@ -1,8 +1,3 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
-import CandidateCard from './CandidateCard';
-import WriteInBallot from './WriteInBallot';
 import ComplianceNotice from '../ComplianceNotice';
 
 // ... rest of the imports

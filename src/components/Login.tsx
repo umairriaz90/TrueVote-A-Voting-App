@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, AlertCircle, Wallet } from 'lucide-react';
 import { ethers } from 'ethers';
@@ -32,6 +32,7 @@ export default function Login() {
 
       setWallet(wallets[0]);
       setContract(trueVoteContract);
+      contract;
     }
   };
 
@@ -65,7 +66,10 @@ export default function Login() {
         ...formData,
         password: '[REDACTED]',
         walletAddress: wallet.accounts[0].address
+
       });
+      const navigate = useNavigate();
+      navigate('/dashboard');
     
     } catch (err) {
       setError('Login failed. Please check your credentials and wallet connection.');

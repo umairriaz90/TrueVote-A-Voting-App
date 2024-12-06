@@ -1,5 +1,4 @@
-import React from 'react';
-import { Book, Video, FileText, HelpCircle, Shield, CheckCircle } from 'lucide-react';
+import { Book, HelpCircle, Shield, CheckCircle } from 'lucide-react';
 import TutorialCard from './TutorialCard';
 import VideoGuide from './VideoGuide';
 import FAQSection from './FAQSection';

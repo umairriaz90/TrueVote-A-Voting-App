@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, AlertCircle, Wallet, CreditCard } from 'lucide-react';
+import { Lock, AlertCircle, CreditCard } from 'lucide-react';
 import { ethers } from 'ethers';
-import { onboard } from '../utils/web3Provider';
-import { WalletState, TrueVoteContract } from '../types/contract';
+import { TrueVoteContract } from '../types/contract';
 import { useWallet } from '../contexts/WalletContext';
 import TrueVoteABI from './contracts/TrueVote.json';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -49,7 +48,9 @@ export default function VoterTurnoutChart() {
         beginAtZero: true,
         max: 100,
         ticks: {
-          callback: (value: number) => `${value}%`,
+          callback: function(value: string | number) {
+            return `${value}%`;
+          },
         },
       },
     },

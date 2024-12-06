@@ -1,5 +1,4 @@
-import React from 'react';
-import { CheckCircle2, Edit3 } from 'lucide-react';
+import { Edit3 } from 'lucide-react';
 
 interface WriteInBallotProps {
   value: string;

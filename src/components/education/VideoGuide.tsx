@@ -1,4 +1,3 @@
-import React from 'react';
 import { Play, Clock } from 'lucide-react';
 
 interface VideoGuideProps {
@@ -12,16 +11,18 @@ export default function VideoGuide({ title, thumbnail, duration, link }: VideoGu
   return (
     <div className="relative group bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative aspect-video">
-        <img 
-          src={thumbnail} 
-          alt={title}
-          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
-          <div className="bg-white rounded-full p-4 shadow-lg transform group-hover:scale-110 transition-transform">
-            <Play className="h-8 w-8 text-patriot-red" />
+        <a href={link}>
+          <img 
+            src={thumbnail} 
+            alt={title}
+            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
+            <div className="bg-white rounded-full p-4 shadow-lg transform group-hover:scale-110 transition-transform">
+              <Play className="h-8 w-8 text-patriot-red" />
+            </div>
           </div>
-        </div>
+        </a>
       </div>
       <div className="p-4 bg-white">
         <h3 className="text-lg font-medium text-patriot-blue mb-2">{title}</h3>

@@ -1,12 +1,9 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   UserCheck,
-  Shield,
   Vote,
   CheckCircle,
   ChevronRight,
-  Key,
   Fingerprint,
   Lock
 } from 'lucide-react';

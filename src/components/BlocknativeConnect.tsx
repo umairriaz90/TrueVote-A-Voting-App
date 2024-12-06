@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ethers } from 'ethers';
 import { onboard } from '../utils/web3Provider';
 import TrueVoteABI from './contracts/TrueVote.json';
@@ -25,6 +25,7 @@ const BlocknativeConnect: React.FC = () => {
 
       setWallet(wallets[0]);
       setContract(trueVoteContract);
+      contract;
     }
   };
 

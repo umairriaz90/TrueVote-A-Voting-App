@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, BarChart2 } from 'lucide-react';
 
 interface VoteHistoryItemProps {

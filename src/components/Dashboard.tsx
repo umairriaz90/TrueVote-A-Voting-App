@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Vote, Calendar, CheckCircle, BarChart2, Clock } from 'lucide-react';
 

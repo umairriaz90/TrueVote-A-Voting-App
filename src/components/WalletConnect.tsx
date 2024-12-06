@@ -1,48 +1,66 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
-import { useWallet } from '../contexts/WalletContext';
+import { onboard } from '../utils/web3Provider';
+import { WalletState, TrueVoteContract } from '../types/contract';
+import TrueVoteABI from './contracts/TrueVote.json';
+import {ethers} from "ethers";
+
+const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
 
 export function WalletConnect() {
-  const { wallet, setWallet } = useWallet();
-  const { isAuthenticated, boundWalletAddress } = useAuth();
-  const [showLoginPage, setShowLoginPage] = useState(false);
-  const handleConnect = async () => {
+  
+  const [wallet, setWallet] = useState<WalletState | null>(null);
+  const [contract, setContract] = useState<TrueVoteContract | null>(null);
+
+
+
+  const connectWallet = async (): Promise<void> => {
+    const wallets = await onboard.connectWallet();
+    
+    if (wallets[0]) {
+      const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider);
+      const signer = ethersProvider.getSigner();
+      
+      const trueVoteContract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        TrueVoteABI,
+        signer
+      ) as TrueVoteContract;
+
+      setWallet(wallets[0]);
+      setContract(trueVoteContract);
+      contract;
+    }
+  };
+
+  const disconnectWallet = async (): Promise<void> => {
     if (wallet) {
-      try {
-        await wallet.connect();
-        const address = await wallet.getAddress();
-        setWallet(wallet);
-        console.log('Connected to wallet:', address);
-      } catch (error) {
-        console.error('Error connecting to wallet:', error);
-      }
+      await onboard.disconnectWallet({ label: wallet.label });
+      setWallet(null);
+      setContract(null);
     }
   };
 
   return (
     <div className="bg-patriot-white p-8 rounded-lg shadow-xl">
-      {!isAuthenticated ? (
-        <div className="space-y-4">
-          <Link 
-            to="/login"
-            className="w-full bg-patriot-blue hover:bg-patriot-blue-dark text-white font-semibold py-2 px-4 rounded-md transition duration-200"
-          >
-            Login
-          </Link>
-        
+      <div className="flex justify-center">
+          {!wallet ? (
+            <button
+              onClick={connectWallet}
+              className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-patriot-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200"
+            >
+              <Wallet className="h-5 w-5 mr-2" />
+              Connect Wallet
+            </button>
+          ) : (
+            <button
+              onClick={disconnectWallet}
+              className="flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200"
+            >
+              <Wallet className="h-5 w-5 mr-2" />
+              {wallet.accounts[0].address.slice(0, 6)}...{wallet.accounts[0].address.slice(-4)}
+            </button>
+          )}
         </div>
-      ) : (
-        <div className="space-y-4">
-          <p className="text-gray-700">Bound Wallet Address: {boundWalletAddress}</p>
-          <button 
-            onClick={() => setWallet(null)}
-            className="w-full bg-patriot-red hover:bg-patriot-red-dark text-white font-semibold py-2 px-4 rounded-md transition duration-200"
-          >
-            Disconnect Wallet
-          </button>
-        </div>
-      )}
     </div>
   );
 }

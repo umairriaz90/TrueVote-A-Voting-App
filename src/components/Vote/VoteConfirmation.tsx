@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertCircle, Check } from 'lucide-react';
 
 interface VoteConfirmationProps {

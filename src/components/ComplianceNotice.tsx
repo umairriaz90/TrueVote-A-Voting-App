@@ -1,4 +1,3 @@
-import React from 'react';
 import { Shield, Lock, FileCheck, AlertCircle } from 'lucide-react';
 
 export default function ComplianceNotice() {
