@@ -11,11 +11,10 @@ import Vote from './components/Vote';
 import About from './components/About';
 import AnalyticsDashboard from './components/analytics/AnalyticsDashboard';
 import EducationPortal from './components/education/EducationPortal';
-import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
-      <AuthProvider>
+      
       <WalletProvider>
     <div className="min-h-screen bg-gradient-to-br from-patriot-blue to-white flex flex-col">
       <Navbar />
@@ -33,7 +32,6 @@ function App() {
       <Footer />
     </div>
     </WalletProvider>
-    </AuthProvider>
     
   );
 }

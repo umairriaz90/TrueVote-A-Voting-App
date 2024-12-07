@@ -3,6 +3,7 @@ import { onboard } from '../utils/web3Provider';
 import { WalletState, TrueVoteContract } from '../types/contract';
 import TrueVoteABI from './contracts/TrueVote.json';
 import {ethers} from "ethers";
+import { Wallet } from "lucide-react";
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
 
