@@ -5,6 +5,8 @@ import { ethers } from 'ethers';
 import { TrueVoteContract } from '../types/contract';
 import { useWallet } from '../contexts/WalletContext';
 import TrueVoteABI from './contracts/TrueVote.json';
+import { sendVotingLink } from '../services/emailService';
+
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
 
@@ -90,13 +92,24 @@ export default function Register() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+  
     try {
       // Register on blockchain
       const registrationSuccess = await registerVoter();
       
       if (registrationSuccess) {
-        // Handle successful registration
+        // Generate voting link
+        const votingLink = `${window.location.origin}/vote/0`;
+        
+        // Send email
+        const emailResult = await sendVotingLink(formData.email, votingLink);
+        
+        if (!emailResult.success) {
+          console.error('Failed to send voting link email');
+          setError('Registration successful but failed to send email');
+        }
+  
+        // Navigate to login
         navigate('/login');
       }
     } catch (err) {
@@ -156,6 +169,19 @@ export default function Register() {
       placeholder="Last Name"
     />
   </div>
+<div>
+  <input
+    name="email"
+    type="email"
+    required
+    value={formData.email}
+    onChange={handleChange}
+    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-patriot-blue focus:border-patriot-blue focus:z-10 sm:text-sm"
+    placeholder="Email Address"
+  />
+</div>
+
+
   <div>
   <label htmlFor="voterID" className="sr-only">
                 Voter ID
