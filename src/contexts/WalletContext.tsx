@@ -9,9 +9,9 @@ const onboard = Onboard({
   chains: [
     {
       id: '0x1',
-      token: 'ETH',
-      label: 'Ethereum Mainnet',
-      rpcUrl: 'https://mainnet.infura.io/v3/YOUR_INFURA_ID'
+      token: 'POL',
+      label: 'Polygon amoy testnet',
+      rpcUrl: 'https://rpc-amoy.polygon.com'
     }
   ],
   appMetadata: {
