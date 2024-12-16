@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import Onboard from '@web3-onboard/core';
 import injectedModule from '@web3-onboard/injected-wallets';
 
@@ -23,17 +23,57 @@ const onboard = Onboard({
 
 interface WalletContextType {
   wallet: any;
-  setWallet: (wallet: any) => void;
-  onboard: any;
+  connectWallet: () => Promise<void>;
+  disconnectWallet: () => Promise<void>;
+  isConnecting: boolean;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
-  const [wallet, setWallet] = useState(null);
+  const [wallet, setWallet] = useState<any>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const connectWallet = async () => {
+    try {
+      setIsConnecting(true);
+      const wallets = await onboard.connectWallet();
+      if (wallets[0]) {
+        setWallet(wallets[0]);
+      }
+    } catch (error) {
+      console.error('Wallet connection failed:', error);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const disconnectWallet = async () => {
+    const [primaryWallet] = onboard.state.get().wallets;
+    if (primaryWallet) {
+      await onboard.disconnectWallet({ label: primaryWallet.label });
+      setWallet(null);
+    }
+  };
+
+  // Check for existing wallet connection on mount
+  useEffect(() => {
+    const checkConnection = async () => {
+      const previouslyConnectedWallets = await onboard.connectWallet();
+      if (previouslyConnectedWallets[0]) {
+        setWallet(previouslyConnectedWallets[0]);
+      }
+    };
+    checkConnection();
+  }, []);
 
   return (
-    <WalletContext.Provider value={{ wallet, setWallet, onboard }}>
+    <WalletContext.Provider value={{ 
+      wallet, 
+      connectWallet, 
+      disconnectWallet,
+      isConnecting 
+    }}>
       {children}
     </WalletContext.Provider>
   );

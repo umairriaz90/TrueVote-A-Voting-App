@@ -28,6 +28,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/analytics" element={<AnalyticsDashboard />} />
         <Route path="/education" element={<EducationPortal />} />
+
       </Routes>
       <Footer />
     </div>

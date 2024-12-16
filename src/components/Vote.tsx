@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { onboard } from '../utils/web3Provider';
-import { WalletState, TrueVoteContract } from '../types/contract';
+import { useWallet } from '../contexts/WalletContext';
+import { TrueVoteContract } from '../types/contract';
 import TrueVoteABI from './contracts/TrueVote.json';
 
 const CONTRACT_ADDRESS = '0x5B7e9aFd3dDe1D2a4D948Cd46b4E0c98e16900FE';
@@ -40,30 +40,19 @@ export default function Vote() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState('');
-  const [wallet, setWallet] = useState<WalletState | null>(null);
+  const { wallet, connectWallet, isConnecting } = useWallet();
   const [contract, setContract] = useState<TrueVoteContract | null>(null);
 
-  const connectWallet = async (): Promise<void> => {
-    const wallets = await onboard.connectWallet();
-    
-    if (wallets[0]) {
-      const ethersProvider = new ethers.providers.Web3Provider(wallets[0].provider);
-      const signer = ethersProvider.getSigner();
-      
-      const trueVoteContract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        TrueVoteABI,
-        signer
-      ) as TrueVoteContract;
-
-      setWallet(wallets[0]);
-      setContract(trueVoteContract);
-      contract;
-    }
-  };
-
   const handleVote = async () => {
-    connectWallet();
+    
+    const contract = new ethers.Contract(
+      CONTRACT_ADDRESS,
+      TrueVoteABI,
+      wallet
+    ) as TrueVoteContract;
+    setContract(contract);
+    
+
     if (!contract || !wallet) {
       setError('Please connect your wallet first');
       return;

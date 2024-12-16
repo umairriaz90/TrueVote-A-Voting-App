@@ -24,7 +24,7 @@ export default function Register() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { wallet } = useWallet();
+  const { wallet, connectWallet, isConnecting } = useWallet();
   const [contract, setContract] = useState<TrueVoteContract | null>(null);
 
 
@@ -35,27 +35,34 @@ export default function Register() {
     });
   };
 
+  const [emailSent, setEmailSent] = useState(false);
+  const [canResend, setCanResend] = useState(true);
+
+  const handleEmailSend = async (email: string, votingLink: string) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, votingLink })
+      });
+      const result = await response.json();
+      setEmailSent(result.success);
+      setCanResend(!result.success);
+      return result.success;
+    } catch (error) {
+      console.error('Email sending failed:', error);
+      setCanResend(true);
+      return false;
+    }
+  };
   
-  const connectWallet = async (): Promise<void> => {
-
-    if (wallet) {
-       const ethersProvider = new ethers.providers.Web3Provider(wallet.provider);
-       const signer = ethersProvider.getSigner();
-       
-       const trueVoteContract = new ethers.Contract(
-         CONTRACT_ADDRESS,
-         TrueVoteABI,
-         signer
-       ) as TrueVoteContract;
- 
-     
-       setContract(trueVoteContract);
-       
-     }
-   };
-
   const registerVoter = async () => {
-    connectWallet();
+    const contractAddress = CONTRACT_ADDRESS;
+    const provider = new ethers.providers.Web3Provider(wallet.provider);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, TrueVoteABI, signer) as TrueVoteContract;
+    setContract(contract);
+
     if (!contract || !wallet) {
       setError('Please connect your wallet first');
       return false;
@@ -92,32 +99,36 @@ export default function Register() {
     e.preventDefault();
     setError('');
     setLoading(true);
-  
     try {
+      if (!wallet) {
+        await connectWallet();
+      }
       // Register on blockchain
       const registrationSuccess = await registerVoter();
       
       if (registrationSuccess) {
-        // Generate voting link
+        // Generate unique voting link with user's voterID
         const votingLink = `${window.location.origin}/vote/0`;
         
-        // Send email
-        const emailResult = await sendVotingLink(formData.email, votingLink);
+        // Send confirmation email
+        const emailResult = await handleEmailSend(formData.email, votingLink);
         
         if (!emailResult.success) {
           console.error('Failed to send voting link email');
-          setError('Registration successful but failed to send email');
+          setError('Registration successful but failed to send confirmation email');
+        } else {
+          // Navigate to login on success
+          navigate('/login');
         }
-  
-        // Navigate to login
-        navigate('/login');
       }
     } catch (err) {
       setError('Registration failed. Please try again.');
+      console.error('Registration error:', err);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-patriot-blue to-white">
@@ -140,6 +151,15 @@ export default function Register() {
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
+          {canResend && (
+              <button
+                type="button"
+                onClick={() => handleEmailSend(formData.email, `${window.location.origin}/vote/${formData.voterID}`)}
+                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+              >
+                Resend Email
+              </button>
+              )}
 
         <div className="flex justify-center">
           
@@ -257,17 +277,18 @@ export default function Register() {
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loading || !wallet}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                loading || !wallet 
+          <button
+                type="submit"
+                disabled={loading}
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                  loading 
                   ? 'bg-gray-400 cursor-not-allowed' 
                   : 'bg-patriot-blue hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200`}
-            >
-              {loading ? 'Registering...' : 'Register'}
-            </button>
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-patriot-blue transition-colors duration-200`}
+                  >
+                  {loading ? 'Registering...' : 'Register'}
+                  </button>
+
           </div>
         </form>
       </div>
